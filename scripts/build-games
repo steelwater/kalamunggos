@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+output_dir="$repo_root/public/games"
+generated_dir="${TMPDIR:-/tmp}/kalamunggos-generated"
+mkdir -p "$output_dir"
+mkdir -p "$generated_dir"
+
+if ! command -v emcc >/dev/null 2>&1; then
+  echo "Emscripten is required. Install it with: brew install emscripten" >&2
+  exit 1
+fi
+
+build_game() {
+  local id="$1"
+  local source="$2"
+  local factory="Kalamunggos_${id//-/_}"
+  local generated="$generated_dir/$id.cpp"
+  node "$repo_root/scripts/preprocess-game.mjs" "$source" "$generated"
+  emcc \
+    "$repo_root/runtime/core/runtime.cpp" \
+    "$repo_root/runtime/core/game-entry.cpp" \
+    "$generated" \
+    -I"$repo_root/runtime/arduboy2-compat" \
+    -I"$repo_root/runtime/core" \
+    -std=c++17 -O2 \
+    -sWASM=1 -sMODULARIZE=1 -sEXPORT_NAME="$factory" -sENVIRONMENT=web \
+    -sALLOW_MEMORY_GROWTH=1 \
+    -sEXPORTED_FUNCTIONS='["_kalamunggos_setup","_kalamunggos_frame","_kalamunggos_framebuffer","_kalamunggos_frame_rate","_kalamunggos_eeprom_data","_kalamunggos_eeprom_size","_kalamunggos_eeprom_dirty","_kalamunggos_clear_eeprom_dirty","_kalamunggos_tones","_kalamunggos_tone_count","_kalamunggos_clear_tones"]' \
+    -sEXPORTED_RUNTIME_METHODS='["HEAPU8"]' \
+    -o "$output_dir/$id.js"
+}
+
+build_game "street-fight-dojo" "$repo_root/games/street-fight-dojo/arduboy/StreetFightDojo/StreetFightDojo.ino"
+build_game "secret-console" "$repo_root/games/secret-console/arduboy/SecretConsole/SecretConsole.ino"
+node "$repo_root/scripts/generate-build-metadata.mjs"

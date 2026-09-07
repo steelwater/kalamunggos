@@ -1,0 +1,8 @@
+[submodule "games/street-fight-dojo"]
+	path = games/street-fight-dojo
+	url = https://github.com/steelwater/Street-Fight-Dojo.git
+	branch = main
+[submodule "games/secret-console"]
+	path = games/secret-console
+	url = https://github.com/steelwater/Secret-Console.git
+	branch = main

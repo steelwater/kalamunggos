@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+git -C "$repo_root" submodule update --init --remote --merge games/street-fight-dojo games/secret-console
+node "$repo_root/scripts/generate-build-metadata.mjs"
+
+echo "Game sources synchronized. Review and commit the updated submodule pointers before a release build."

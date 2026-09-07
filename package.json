@@ -1,0 +1,29 @@
+{
+  "name": "kalamunggos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A small virtual handheld for Dan's Arduboy-compatible games.",
+  "scripts": {
+    "dev": "npm run build:games && vite",
+    "dev:latest": "npm run sync:games && npm run dev",
+    "sync:games": "./scripts/sync-games",
+    "build:games": "./scripts/build-games",
+    "build": "npm run build:games && tsc --noEmit && vite build",
+    "test:native": "./scripts/test-native-runtime",
+    "test": "vitest run && npm run test:native",
+    "check": "npm run test && npm run build",
+    "cap:sync": "npm run build && cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/ios": "^7.6.9"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.4",
+    "vitest": "^3.2.4"
+  }
+}

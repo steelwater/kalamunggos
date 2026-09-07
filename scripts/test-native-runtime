@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+build_dir="${TMPDIR:-/tmp}/kalamunggos-native-tests"
+mkdir -p "$build_dir"
+
+compile_and_run() {
+  local id="$1"
+  local source="$2"
+  local expectation="$3"
+  local generated="$build_dir/$id.cpp"
+  node "$repo_root/scripts/preprocess-game.mjs" "$source" "$generated"
+  clang++ -std=c++17 -Wall -Wextra \
+    "$repo_root/runtime/core/runtime.cpp" \
+    "$repo_root/runtime/core/game-entry.cpp" \
+    "$generated" \
+    "$repo_root/tests/native-runtime-test.cpp" \
+    -I"$repo_root/runtime/arduboy2-compat" \
+    -I"$repo_root/runtime/core" \
+    "$expectation" \
+    -o "$build_dir/$id"
+  "$build_dir/$id"
+}
+
+compile_and_run street-fight-dojo "$repo_root/games/street-fight-dojo/arduboy/StreetFightDojo/StreetFightDojo.ino" -DEXPECT_EEPROM
+compile_and_run secret-console "$repo_root/games/secret-console/arduboy/SecretConsole/SecretConsole.ino" -DEXPECT_TONE
