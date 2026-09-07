@@ -23,5 +23,5 @@ compile_and_run() {
   "$build_dir/$id"
 }
 
-compile_and_run street-fight-dojo "$repo_root/games/street-fight-dojo/arduboy/StreetFightDojo/StreetFightDojo.ino" -DEXPECT_EEPROM
-compile_and_run secret-console "$repo_root/games/secret-console/arduboy/SecretConsole/SecretConsole.ino" -DEXPECT_TONE
+compile_and_run street-fight-dojo "$repo_root/games/street-fight-dojo/arduboy/StreetFightDojo/StreetFightDojo.ino" -DEXPECT_STREET_FIGHT_DOJO
+compile_and_run secret-console "$repo_root/games/secret-console/arduboy/SecretConsole/SecretConsole.ino" -DEXPECT_SECRET_CONSOLE

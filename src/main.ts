@@ -105,8 +105,10 @@ function render(framebuffer: Uint8Array): void {
 }
 
 function tick(now: number): void {
-  if (activeGame && !menu.open && now - lastGameFrame >= 1000 / activeGame.frameRate) {
-    lastGameFrame = now;
+  const frameDuration = activeGame ? 1000 / activeGame.frameRate : 0;
+  if (activeGame && !menu.open && now - lastGameFrame >= frameDuration - 0.5) {
+    const elapsedFrames = Math.max(1, Math.floor((now - lastGameFrame + 0.5) / frameDuration));
+    lastGameFrame += elapsedFrames * frameDuration;
     render(activeGame.frame(buttonMask(), settings.sound));
   }
   animationFrame = requestAnimationFrame(tick);
