@@ -108,52 +108,67 @@ button { font: inherit; }
   background-image: radial-gradient(circle, rgba(220,235,207,.075) .75px, transparent .8px);
   background-size: 4px 4px;
   font-family: "Courier New", ui-monospace, monospace;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-shadow: 1px 0 currentColor;
 }
 
-.game-library { display: grid; grid-template-columns: .7fr 1.3fr; gap: clamp(8px, 2.5vw, 22px); align-items: center; padding: clamp(10px, 3.5vw, 26px); }
-.firmware-heading p { margin: 0 0 4px; font-size: clamp(.42rem, 1.6vw, .68rem); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .58; }
-.firmware-heading h1 { margin: 0; font-size: clamp(.8rem, 4vw, 1.7rem); line-height: .9; letter-spacing: -.06em; text-transform: uppercase; }
-.game-list { display: grid; gap: clamp(4px, 1.2vw, 8px); }
+.game-library { display: grid; grid-template-rows: auto 1fr auto; gap: clamp(5px, 1.4vw, 10px); padding: clamp(8px, 2.4vw, 18px); }
+.firmware-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 2px solid currentColor; }
+.firmware-heading p { margin: 0 0 3px; font-size: clamp(.55rem, 1.7vw, .75rem); letter-spacing: .12em; opacity: .72; }
+.firmware-heading h1 { margin: 0 0 3px; font-size: clamp(.9rem, 3.5vw, 1.5rem); line-height: 1; letter-spacing: -.07em; }
+.game-list { display: grid; gap: clamp(3px, .9vw, 7px); align-content: center; }
 .game-card {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1.25em 1fr;
   align-items: center;
-  gap: clamp(5px, 1.4vw, 10px);
+  gap: clamp(4px, 1vw, 8px);
   min-width: 0;
-  padding: clamp(5px, 1.4vw, 10px);
-  border: 1px solid rgba(220,235,207,.42);
-  border-radius: 2px;
+  min-height: clamp(28px, 6vw, 42px);
+  padding: clamp(3px, .8vw, 6px) clamp(5px, 1.2vw, 9px);
+  border: 2px solid transparent;
   color: inherit;
-  background: rgba(220,235,207,.05);
+  background: transparent;
   text-align: left;
   cursor: pointer;
 }
-.game-card:hover, .game-card:focus-visible { color: #10150f; background: #dcebcf; outline: none; }
-.game-card span, .game-card small { font-size: clamp(.4rem, 1.35vw, .62rem); opacity: .6; }
-.game-card strong { overflow: hidden; font-size: clamp(.48rem, 1.75vw, .78rem); text-overflow: ellipsis; white-space: nowrap; }
+.game-card:hover, .game-card:focus-visible, .game-card.is-selected { color: #10150f; background: #dcebcf; outline: none; }
+.selection-cursor { font-size: clamp(.7rem, 2.3vw, 1rem); visibility: hidden; }
+.game-card.is-selected .selection-cursor { visibility: visible; }
+.game-card strong { overflow: hidden; font-size: clamp(.72rem, 2.5vw, 1.12rem); line-height: 1; letter-spacing: -.04em; text-overflow: ellipsis; white-space: nowrap; }
+.control-hint { margin: 0; font-size: clamp(.46rem, 1.35vw, .63rem); line-height: 1; letter-spacing: .03em; text-align: center; opacity: .7; }
 
-.system-menu { display: grid; grid-template-columns: .42fr 1.58fr; gap: clamp(6px, 2vw, 18px); padding: clamp(7px, 2.2vw, 18px); }
-.menu-heading { align-self: start; }
-.menu-heading span { display: block; margin-bottom: 3px; font-size: clamp(.38rem, 1.2vw, .58rem); letter-spacing: .16em; text-transform: uppercase; opacity: .58; }
-.menu-heading h2 { margin: 0; font-size: clamp(.7rem, 3vw, 1.4rem); line-height: .9; letter-spacing: -.06em; text-transform: uppercase; }
-.menu-actions { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(3px, .8vw, 6px); align-content: center; min-width: 0; }
+.system-menu { display: grid; grid-template-rows: auto 1fr auto; gap: clamp(4px, 1vw, 8px); padding: clamp(7px, 2vw, 15px); }
+.menu-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 3px; border-bottom: 2px solid currentColor; }
+.menu-heading > div:first-child { display: flex; align-items: baseline; gap: clamp(6px, 1.5vw, 12px); }
+.menu-heading span { font-size: clamp(.5rem, 1.4vw, .66rem); letter-spacing: .1em; opacity: .62; }
+.menu-heading h2 { margin: 0; font-size: clamp(.85rem, 2.8vw, 1.25rem); line-height: 1; letter-spacing: -.06em; }
+.page-controls { display: flex; align-items: center; gap: 6px; }
+.page-controls button { padding: 0 2px; border: 0; color: inherit; background: transparent; font-size: clamp(.55rem, 1.5vw, .7rem); cursor: pointer; }
+.menu-page { min-width: 2.4em; font-size: clamp(.55rem, 1.5vw, .7rem); text-align: center; }
+.menu-actions { display: grid; grid-template-rows: repeat(4, 1fr); gap: 2px; min-height: 0; }
 .menu-actions button {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1.25em 1fr auto;
+  align-items: center;
   gap: 4px;
   min-width: 0;
-  padding: clamp(3px, .8vw, 6px);
-  border: 1px solid rgba(220,235,207,.36);
-  border-radius: 2px;
+  padding: 1px clamp(5px, 1.2vw, 9px);
+  border: 2px solid transparent;
   color: inherit;
-  background: rgba(220,235,207,.04);
-  font-size: clamp(.5rem, 1.45vw, .68rem);
+  background: transparent;
+  font-size: clamp(.68rem, 2.25vw, 1rem);
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
   text-align: left;
   cursor: pointer;
 }
-.menu-actions button:hover, .menu-actions button:focus-visible { color: #10150f; background: #dcebcf; outline: none; }
-.menu-actions button span { flex: none; opacity: .58; text-transform: capitalize; }
-.about { position: absolute; inset: clamp(5px, 1.5vw, 12px); overflow: auto; padding: clamp(8px, 2vw, 16px); color: #10150f; background: #dcebcf; font-size: clamp(.42rem, 1.4vw, .66rem); line-height: 1.25; }
+.menu-actions button::before { content: "▶"; visibility: hidden; }
+.menu-actions button:hover, .menu-actions button:focus-visible, .menu-actions button.is-selected { color: #10150f; background: #dcebcf; outline: none; }
+.menu-actions button.is-selected::before { visibility: visible; }
+.menu-actions button span { opacity: .62; }
+.about { position: absolute; inset: clamp(5px, 1.5vw, 12px); overflow: auto; padding: clamp(8px, 2vw, 16px); color: #10150f; background: #dcebcf; font-size: clamp(.65rem, 2vw, .86rem); line-height: 1.25; text-transform: none; }
 .about p { margin: 3px 0; }
 .about-close { position: sticky; top: 0; float: right; border: 0; color: #10150f; background: transparent; font-weight: 900; cursor: pointer; }
 
@@ -188,8 +203,6 @@ button { font: inherit; }
 
 @media (max-width: 430px) {
   .console-body { grid-template-rows: minmax(0, 1fr) minmax(210px, 42vh); }
-  .game-library { grid-template-columns: .62fr 1.38fr; }
-  .game-card small { display: none; }
   .dpad { grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); }
   .dpad button { min-width: 48px; min-height: 48px; }
   .action-buttons { gap: 13px; }
