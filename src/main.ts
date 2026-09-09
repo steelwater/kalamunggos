@@ -8,6 +8,7 @@ const root = document.querySelector<HTMLDivElement>("#app")!;
 if (!root) throw new Error("Missing app root");
 
 const kalamunggosVersion = "0.1.0";
+const kalaOsVersion = "0.10";
 let settings = loadSettings();
 let activeGame: WasmGame | undefined;
 let activeDefinition: GameDefinition | undefined;
@@ -23,8 +24,6 @@ root.innerHTML = `
   <main class="app-shell ${settings.skin === "white" ? "skin-white" : `skin-${settings.skin}`}">
     <section class="handheld" aria-label="Virtual handheld">
       <header class="handheld-header">
-        <button class="back-button" type="button" aria-label="Return to game list" hidden>← Games</button>
-        <span class="header-spacer" aria-hidden="true"></span>
         <span class="status-light" aria-hidden="true"></span>
       </header>
       <div class="console-body">
@@ -37,7 +36,7 @@ root.innerHTML = `
               <canvas class="game-screen" width="128" height="64" aria-label="Game display" hidden></canvas>
               <section class="screen-ui game-library" aria-labelledby="library-title">
                 <div class="firmware-heading">
-                  <p>Kala OS <span>Kalamunggos v${kalamunggosVersion}</span></p>
+                  <p>Kala OS v${kalaOsVersion}</p>
                   <h1 id="library-title">Game select</h1>
                 </div>
                 <div class="game-list">
@@ -47,7 +46,7 @@ root.innerHTML = `
               </section>
               <section class="screen-ui system-menu" hidden aria-labelledby="menu-title">
                 <div class="menu-heading">
-                  <div><h2 id="menu-title">Kala OS</h2><span>Kalamunggos v${kalamunggosVersion}</span><em>Paused</em></div>
+                  <div><h2 id="menu-title">Kala OS <span>v${kalaOsVersion}</span></h2><em>Paused</em></div>
                   <div class="page-controls"><button type="button" data-page="-1" aria-label="Previous settings page">◀</button><strong class="menu-page"></strong><button type="button" data-page="1" aria-label="Next settings page">▶</button></div>
                 </div>
                 <div class="menu-actions">
@@ -87,7 +86,6 @@ root.innerHTML = `
 
 const shell = root.querySelector<HTMLElement>(".app-shell")!;
 const library = root.querySelector<HTMLElement>(".game-library")!;
-const backButton = root.querySelector<HTMLButtonElement>(".back-button")!;
 const titleDisplay = root.querySelector<HTMLElement>(".title-display")!;
 const title = root.querySelector<HTMLElement>(".title-display-text")!;
 const canvas = root.querySelector<HTMLCanvasElement>("canvas")!;
@@ -189,7 +187,6 @@ async function launch(definition: GameDefinition): Promise<void> {
   library.hidden = true;
   menu.hidden = true;
   about.hidden = true;
-  backButton.hidden = false;
   canvas.hidden = false;
   context.fillStyle = "#0a0a0a";
   context.fillRect(0, 0, 128, 64);
@@ -212,7 +209,6 @@ function showLibrary(): void {
   about.hidden = true;
   canvas.hidden = true;
   titleDisplay.hidden = true;
-  backButton.hidden = true;
   library.hidden = false;
   selectedGameIndex = 0;
   updateGameSelection();
@@ -250,7 +246,6 @@ gameButtons.forEach((button, index) => {
   });
 });
 
-backButton.addEventListener("click", showLibrary);
 root.querySelector<HTMLButtonElement>(".system-button")!.addEventListener("click", showMenu);
 
 function handleKalaInput(button: ButtonName): boolean {
