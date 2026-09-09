@@ -7,6 +7,7 @@ import { nextSkin, skins } from "./skins";
 const root = document.querySelector<HTMLDivElement>("#app")!;
 if (!root) throw new Error("Missing app root");
 
+const kalamunggosVersion = "0.1.0";
 let settings = loadSettings();
 let activeGame: WasmGame | undefined;
 let activeDefinition: GameDefinition | undefined;
@@ -32,35 +33,37 @@ root.innerHTML = `
             <div class="title-display-window"><span class="title-display-text"></span></div>
           </div>
           <div class="screen-bezel">
-            <canvas class="game-screen" width="128" height="64" aria-label="Game display" hidden></canvas>
-            <section class="screen-ui game-library" aria-labelledby="library-title">
-              <div class="firmware-heading">
-                <p>Kala UI</p>
-                <h1 id="library-title">Game select</h1>
-              </div>
-              <div class="game-list">
-                ${games.map((game, index) => `<button class="game-card${index === 0 ? " is-selected" : ""}" data-game="${game.id}" aria-current="${index === 0 ? "true" : "false"}"><span class="selection-cursor" aria-hidden="true">▶</span><strong>${game.displayName}</strong></button>`).join("")}
-              </div>
-              <p class="control-hint">D-PAD SELECT&nbsp;&nbsp; A PLAY</p>
-            </section>
-            <section class="screen-ui system-menu" hidden aria-labelledby="menu-title">
-              <div class="menu-heading">
-                <div><h2 id="menu-title">Kala UI</h2><span>Paused</span></div>
-                <div class="page-controls"><button type="button" data-page="-1" aria-label="Previous settings page">◀</button><strong class="menu-page"></strong><button type="button" data-page="1" aria-label="Next settings page">▶</button></div>
-              </div>
-              <div class="menu-actions">
-                <button data-action="resume">Resume</button>
-                <button data-action="games">Change Game</button>
-                <button data-action="skin">Change Skin <span class="skin-name"></span></button>
-                <button data-action="sound">Sound <span class="sound-state"></span></button>
-                <button data-action="vibration">Vibration <span class="vibration-state"></span></button>
-                <button data-action="title">Title Display <span class="title-state"></span></button>
-                <button data-action="restart">Restart Game</button>
-                <button data-action="about">About</button>
-              </div>
-              <p class="control-hint">▲▼ SELECT&nbsp;&nbsp; A OK&nbsp;&nbsp; B BACK</p>
-              <section class="about" hidden></section>
-            </section>
+            <div class="screen-surface">
+              <canvas class="game-screen" width="128" height="64" aria-label="Game display" hidden></canvas>
+              <section class="screen-ui game-library" aria-labelledby="library-title">
+                <div class="firmware-heading">
+                  <p>Kala OS <span>Kalamunggos v${kalamunggosVersion}</span></p>
+                  <h1 id="library-title">Game select</h1>
+                </div>
+                <div class="game-list">
+                  ${games.map((game, index) => `<button class="game-card${index === 0 ? " is-selected" : ""}" data-game="${game.id}" aria-current="${index === 0 ? "true" : "false"}"><span class="selection-cursor" aria-hidden="true">▶</span><strong>${game.displayName}</strong></button>`).join("")}
+                </div>
+                <p class="control-hint">D-PAD SELECT&nbsp;&nbsp; A PLAY</p>
+              </section>
+              <section class="screen-ui system-menu" hidden aria-labelledby="menu-title">
+                <div class="menu-heading">
+                  <div><h2 id="menu-title">Kala OS</h2><span>Kalamunggos v${kalamunggosVersion}</span><em>Paused</em></div>
+                  <div class="page-controls"><button type="button" data-page="-1" aria-label="Previous settings page">◀</button><strong class="menu-page"></strong><button type="button" data-page="1" aria-label="Next settings page">▶</button></div>
+                </div>
+                <div class="menu-actions">
+                  <button data-action="resume">Resume</button>
+                  <button data-action="games">Change Game</button>
+                  <button data-action="skin">Change Skin <span class="skin-name"></span></button>
+                  <button data-action="sound">Sound <span class="sound-state"></span></button>
+                  <button data-action="vibration">Vibration <span class="vibration-state"></span></button>
+                  <button data-action="title">Title Display <span class="title-state"></span></button>
+                  <button data-action="restart">Restart Game</button>
+                  <button data-action="about">About</button>
+                </div>
+                <p class="control-hint">▲▼ SELECT&nbsp;&nbsp; A OK&nbsp;&nbsp; B BACK</p>
+                <section class="about" hidden></section>
+              </section>
+            </div>
           </div>
         </div>
         <div class="controls" aria-label="Game controls">
@@ -347,7 +350,7 @@ menu.addEventListener("click", (event) => {
       fetch("/games/build-metadata.json")
         .then((response) => response.json())
         .then((metadata: { builtAt: string; games: Array<{ displayName: string; commit: string }> }) => {
-          about.innerHTML = `<button class="about-close" type="button" aria-label="Close about screen">×</button><p>Kalamunggos 0.1.0</p>${metadata.games.map((game) => `<p>${game.displayName}<br><code>${game.commit.slice(0, 12)}</code></p>`).join("")}<p>Built ${new Date(metadata.builtAt).toLocaleString()}</p>`;
+          about.innerHTML = `<button class="about-close" type="button" aria-label="Close about screen">×</button><p>Kalamunggos ${kalamunggosVersion}</p>${metadata.games.map((game) => `<p>${game.displayName}<br><code>${game.commit.slice(0, 12)}</code></p>`).join("")}<p>Built ${new Date(metadata.builtAt).toLocaleString()}</p>`;
         })
         .catch(() => { about.textContent = "Build metadata unavailable."; });
     }

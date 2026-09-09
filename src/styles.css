@@ -61,6 +61,7 @@ button { font: inherit; }
   background: linear-gradient(160deg, #343833, #171a17);
   box-shadow: inset 0 1px 1px rgba(255,255,255,.13), 0 5px 10px rgba(0,0,0,.2);
 }
+.title-display[hidden] { display: block !important; visibility: hidden; }
 .title-display-window {
   position: relative;
   overflow: hidden;
@@ -89,19 +90,18 @@ button { font: inherit; }
 @keyframes title-scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 
 .screen-bezel {
-  position: relative;
   overflow: hidden;
   width: 100%;
-  aspect-ratio: 2;
   padding: clamp(10px, 3vw, 20px);
   border-radius: 20px;
   background: #080909;
   box-shadow: inset 0 0 0 1px #3a3c3b, 0 18px 36px rgba(0, 0, 0, .28), 0 0 45px var(--screen-glow);
 }
+.screen-surface { position: relative; width: 100%; aspect-ratio: 2; }
 .game-screen { display: block; width: 100%; height: 100%; background: #090a09; image-rendering: pixelated; image-rendering: crisp-edges; }
 .screen-ui {
   position: absolute;
-  inset: clamp(10px, 3vw, 20px);
+  inset: 0;
   overflow: hidden;
   color: #dcebcf;
   background-color: #10150f;
@@ -116,6 +116,7 @@ button { font: inherit; }
 .game-library { display: grid; grid-template-rows: auto 1fr auto; gap: clamp(5px, 1.4vw, 10px); padding: clamp(8px, 2.4vw, 18px); }
 .firmware-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 2px solid currentColor; }
 .firmware-heading p { margin: 0 0 3px; font-size: clamp(.55rem, 1.7vw, .75rem); letter-spacing: .12em; opacity: .72; }
+.firmware-heading p span { margin-left: .6em; font-size: .72em; letter-spacing: .04em; white-space: nowrap; }
 .firmware-heading h1 { margin: 0 0 3px; font-size: clamp(.9rem, 3.5vw, 1.5rem); line-height: 1; letter-spacing: -.07em; }
 .game-list { display: grid; gap: clamp(3px, .9vw, 7px); align-content: center; }
 .game-card {
@@ -142,6 +143,7 @@ button { font: inherit; }
 .menu-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 3px; border-bottom: 2px solid currentColor; }
 .menu-heading > div:first-child { display: flex; align-items: baseline; gap: clamp(6px, 1.5vw, 12px); }
 .menu-heading span { font-size: clamp(.5rem, 1.4vw, .66rem); letter-spacing: .1em; opacity: .62; }
+.menu-heading em { font-size: clamp(.46rem, 1.25vw, .6rem); font-style: normal; letter-spacing: .08em; opacity: .5; }
 .menu-heading h2 { margin: 0; font-size: clamp(.85rem, 2.8vw, 1.25rem); line-height: 1; letter-spacing: -.06em; }
 .page-controls { display: flex; align-items: center; gap: 6px; }
 .page-controls button { padding: 0 2px; border: 0; color: inherit; background: transparent; font-size: clamp(.55rem, 1.5vw, .7rem); cursor: pointer; }
@@ -188,6 +190,11 @@ button { font: inherit; }
 .action-buttons button { width: 66px; height: 66px; border-radius: 50%; font-weight: 900; font-size: 1.05rem; background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 75%, white), var(--accent)); }
 .action-buttons span { display: block; transform: rotate(12deg); }
 .brand-mark { margin: 6px 0 0; text-align: center; font-size: .63rem; font-weight: 900; letter-spacing: .3em; opacity: .38; }
+
+@media (min-width: 700px) and (min-height: 701px) and (max-height: 800px) {
+  .console-body { grid-template-rows: minmax(0, 1fr) minmax(190px, 32vh); gap: 8px; }
+  .display-stack { width: min(100%, 560px); }
+}
 
 @media (orientation: landscape) and (max-height: 700px) {
   .handheld { padding-block: max(env(safe-area-inset-top), 8px) max(env(safe-area-inset-bottom), 8px); }
