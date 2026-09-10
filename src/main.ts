@@ -107,15 +107,21 @@ function updateSettingsUi(): void {
   root.querySelector<HTMLElement>(".vibration-state")!.textContent = settings.vibration ? "On" : "Off";
   root.querySelector<HTMLElement>(".title-state")!.textContent = settings.titleDisplay ? "On" : "Off";
   titleDisplay.hidden = !settings.titleDisplay || !activeDefinition;
+  if (!titleDisplay.hidden) updateTitleOverflow();
   saveSettings(settings);
+}
+
+function updateTitleOverflow(): void {
+  title.classList.remove("is-scrolling");
+  requestAnimationFrame(() => {
+    if (titleDisplay.hidden) return;
+    title.classList.toggle("is-scrolling", title.scrollWidth > title.parentElement!.clientWidth);
+  });
 }
 
 function updateTitle(definition: GameDefinition): void {
   title.textContent = definition.displayName;
-  title.classList.remove("is-scrolling");
-  requestAnimationFrame(() => {
-    title.classList.toggle("is-scrolling", title.scrollWidth > title.parentElement!.clientWidth);
-  });
+  updateTitleOverflow();
 }
 
 function wrapSelection(index: number, length: number): number {

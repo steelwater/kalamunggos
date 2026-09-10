@@ -60,7 +60,6 @@ button { font: inherit; }
   background: linear-gradient(160deg, #343833, #171a17);
   box-shadow: inset 0 1px 1px rgba(255,255,255,.13), 0 5px 10px rgba(0,0,0,.2);
 }
-.title-display[hidden] { display: block !important; visibility: hidden; }
 .title-display-window {
   position: relative;
   overflow: hidden;
