@@ -196,10 +196,12 @@ button { font: inherit; }
 
 @media (orientation: landscape) and (max-height: 700px) {
   .handheld { padding-block: max(env(safe-area-inset-top), 8px) max(env(safe-area-inset-bottom), 8px); }
-  .console-body { grid-template-rows: minmax(0, 1fr) auto; gap: 6px; width: min(100%, 700px); }
+  .console-body { grid-template-rows: minmax(0, 1fr) auto; gap: 6px; width: min(100%, 980px); }
   .display-stack { width: min(100%, 440px); }
   .title-display { margin-bottom: 6px; }
-  .controls { --dpad-size: min(10vh, 44px); grid-template-columns: 1fr 52px 1fr; width: min(100%, 620px); margin: auto; }
+  .controls { --dpad-size: min(10vh, 44px); grid-template-columns: 1fr 52px 1fr; width: 100%; margin: auto; }
+  .dpad { justify-self: start; }
+  .action-buttons { justify-self: end; }
   .action-buttons button { width: min(13vh, 58px); height: min(13vh, 58px); }
   .brand-mark { display: none; }
 }
