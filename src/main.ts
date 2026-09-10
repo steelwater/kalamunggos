@@ -7,7 +7,7 @@ import { nextSkin, skins } from "./skins";
 const root = document.querySelector<HTMLDivElement>("#app")!;
 if (!root) throw new Error("Missing app root");
 
-const kalamunggosVersion = "0.1.0";
+const kalamunggosVersion = "0.1.1";
 const kalaOsVersion = "0.10";
 let settings = loadSettings();
 let activeGame: WasmGame | undefined;
