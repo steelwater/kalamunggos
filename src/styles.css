@@ -171,17 +171,18 @@ button { font: inherit; }
 .about p { margin: 3px 0; }
 .about-close { position: sticky; top: 0; float: right; border: 0; color: #10150f; background: transparent; font-weight: 900; cursor: pointer; }
 
-.controls { display: grid; grid-template-columns: 1fr 52px 1fr; align-items: center; width: 100%; }
+.controls { --dpad-size: 56px; display: grid; grid-template-columns: 1fr 52px 1fr; align-items: center; width: 100%; }
 .controls button { border: 0; color: #dedfd9; background: linear-gradient(145deg, var(--control-highlight), var(--control)); box-shadow: inset 0 1px 1px rgba(255,255,255,.15), 0 7px 0 color-mix(in srgb, var(--control) 75%, black), 0 11px 16px rgba(0,0,0,.23); user-select: none; -webkit-user-select: none; }
 .controls button.is-pressed, .controls button:active { transform: translateY(5px); box-shadow: inset 0 1px 1px rgba(255,255,255,.1), 0 2px 0 color-mix(in srgb, var(--control) 75%, black); }
-.dpad { justify-self: center; display: grid; grid-template-columns: repeat(3, 56px); grid-template-rows: repeat(3, 56px); filter: drop-shadow(0 8px 8px rgba(0,0,0,.2)); }
-.dpad button { min-width: 56px; min-height: 56px; border-radius: 9px; box-shadow: none; font-size: .7rem; }
+.dpad { justify-self: center; display: grid; grid-template-columns: repeat(3, var(--dpad-size)); grid-template-rows: repeat(3, var(--dpad-size)); filter: drop-shadow(0 8px 8px rgba(0,0,0,.2)); }
+.dpad button { min-width: var(--dpad-size); min-height: var(--dpad-size); border-radius: 9px; box-shadow: none; font-size: .7rem; }
 .dpad [data-button="up"] { grid-area: 1 / 2; }
 .dpad [data-button="left"] { grid-area: 2 / 1; }
 .dpad-center { grid-area: 2 / 2; }
 .dpad [data-button="right"] { grid-area: 2 / 3; }
 .dpad [data-button="down"] { grid-area: 3 / 2; }
-.system-button { place-self: center; width: 42px; height: 24px; border-radius: 999px; transform: rotate(-18deg); }
+.system-button { place-self: center; width: 42px; height: 24px; border-radius: 999px; transform: translateY(calc(0px - var(--dpad-size))) rotate(-18deg); }
+.controls .system-button.is-pressed, .controls .system-button:active { transform: translateY(calc(5px - var(--dpad-size))) rotate(-18deg); }
 .system-button span { display: block; width: 14px; height: 3px; margin: auto; border-radius: 3px; background: #aaa; }
 .action-buttons { justify-self: center; display: flex; gap: 22px; transform: rotate(-12deg); }
 .action-buttons button { width: 66px; height: 66px; border-radius: 50%; font-weight: 900; font-size: 1.05rem; background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 75%, white), var(--accent)); }
@@ -195,20 +196,17 @@ button { font: inherit; }
 
 @media (orientation: landscape) and (max-height: 700px) {
   .handheld { padding-block: max(env(safe-area-inset-top), 8px) max(env(safe-area-inset-bottom), 8px); }
-  .console-body { grid-template-columns: minmax(280px, 1.3fr) minmax(300px, 1fr); grid-template-rows: 1fr; gap: clamp(18px, 4vw, 48px); width: min(100%, 900px); }
-  .display-stack { width: 100%; }
+  .console-body { grid-template-rows: minmax(0, 1fr) auto; gap: 6px; width: min(100%, 700px); }
+  .display-stack { width: min(100%, 440px); }
   .title-display { margin-bottom: 6px; }
-  .controls { grid-template-columns: 1fr 42px 1fr; }
-  .dpad { grid-template-columns: repeat(3, min(14vh, 60px)); grid-template-rows: repeat(3, min(14vh, 60px)); }
-  .dpad button { min-width: min(14vh, 60px); min-height: min(14vh, 60px); }
-  .action-buttons button { width: min(16vh, 72px); height: min(16vh, 72px); }
+  .controls { --dpad-size: min(10vh, 44px); grid-template-columns: 1fr 52px 1fr; width: min(100%, 620px); margin: auto; }
+  .action-buttons button { width: min(13vh, 58px); height: min(13vh, 58px); }
   .brand-mark { display: none; }
 }
 
 @media (max-width: 430px) {
   .console-body { grid-template-rows: minmax(0, 1fr) minmax(210px, 42vh); }
-  .dpad { grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); }
-  .dpad button { min-width: 48px; min-height: 48px; }
+  .controls { --dpad-size: 48px; }
   .action-buttons { gap: 13px; }
   .action-buttons button { width: 58px; height: 58px; }
 }
