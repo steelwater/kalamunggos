@@ -21,12 +21,16 @@ export function eepromStorageKey(gameId: string): string {
   return `kalamunggos:eeprom:${gameId}`;
 }
 
+export function assetUrl(path: string, baseUrl = document.baseURI): string {
+  return new URL(path, baseUrl).href;
+}
+
 async function loadFactory(definition: GameDefinition): Promise<ModuleFactory> {
   const scope = window as unknown as Record<string, unknown>;
   if (typeof scope[definition.moduleFactory] !== "function") {
     await new Promise<void>((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = definition.modulePath;
+      script.src = assetUrl(definition.modulePath);
       script.onload = () => resolve();
       script.onerror = () => reject(new Error(`Could not load ${definition.modulePath}`));
       document.head.append(script);
@@ -50,7 +54,7 @@ export class WasmGame {
 
   static async create(definition: GameDefinition): Promise<WasmGame> {
     const factory = await loadFactory(definition);
-    const module = await factory({ locateFile: (file: string) => `/games/${file}` });
+    const module = await factory({ locateFile: (file: string) => assetUrl(`games/${file}`) });
     const game = new WasmGame(definition, module);
     game.restoreEeprom();
     module._kalamunggos_setup();

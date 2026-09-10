@@ -26,7 +26,7 @@ export const games: readonly GameDefinition[] = [
     repository: "https://github.com/steelwater/Street-Fight-Dojo",
     branch: "main",
     sourcePath: "arduboy/StreetFightDojo/StreetFightDojo.ino",
-    modulePath: "/games/street-fight-dojo.js",
+    modulePath: "games/street-fight-dojo.js",
     moduleFactory: "Kalamunggos_street_fight_dojo",
   },
   {
@@ -35,7 +35,7 @@ export const games: readonly GameDefinition[] = [
     repository: "https://github.com/steelwater/Secret-Console",
     branch: "main",
     sourcePath: "arduboy/SecretConsole/SecretConsole.ino",
-    modulePath: "/games/secret-console.js",
+    modulePath: "games/secret-console.js",
     moduleFactory: "Kalamunggos_secret_console",
   },
 ] as const;
