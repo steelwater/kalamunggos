@@ -33,6 +33,19 @@ describe("skins", () => {
 
 describe("settings", () => {
   it("recovers safely from invalid local data", () => {
-    expect(loadSettings({ getItem: () => "not-json" })).toEqual({ skin: "white", sound: true, vibration: true });
+    expect(loadSettings({ getItem: () => "not-json" })).toEqual({ skin: "white", sound: true, vibration: true, titleDisplay: true });
+  });
+
+  it("adds the title display default to existing saved settings", () => {
+    expect(loadSettings({ getItem: () => JSON.stringify({ skin: "dark", sound: false, vibration: false }) })).toEqual({
+      skin: "dark",
+      sound: false,
+      vibration: false,
+      titleDisplay: true,
+    });
+  });
+
+  it("restores a hidden title display preference", () => {
+    expect(loadSettings({ getItem: () => JSON.stringify({ titleDisplay: false }) }).titleDisplay).toBe(false);
   });
 });

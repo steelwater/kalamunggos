@@ -4,12 +4,14 @@ export interface Settings {
   skin: SkinId;
   sound: boolean;
   vibration: boolean;
+  titleDisplay: boolean;
 }
 
 export const defaultSettings: Settings = {
   skin: "white",
   sound: true,
   vibration: true,
+  titleDisplay: true,
 };
 
 const key = "kalamunggos:settings";
@@ -22,6 +24,7 @@ export function loadSettings(storage: Pick<Storage, "getItem"> = localStorage): 
       skin: saved.skin === "dark" || saved.skin === "rainbow" ? saved.skin : "white",
       sound: saved.sound ?? true,
       vibration: saved.vibration ?? true,
+      titleDisplay: saved.titleDisplay ?? true,
     };
   } catch {
     return { ...defaultSettings };
