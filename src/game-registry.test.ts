@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { combineButtons, games, getGame } from "./game-registry";
-import { eepromStorageKey } from "./runtime/wasm-game";
+import { assetUrl, eepromStorageKey } from "./runtime/wasm-game";
 import { nextSkin } from "./skins";
 import { loadSettings } from "./settings";
 
@@ -20,6 +20,12 @@ describe("game registry", () => {
 
   it("isolates EEPROM storage by stable game ID", () => {
     expect(eepromStorageKey(games[0].id)).not.toBe(eepromStorageKey(games[1].id));
+  });
+
+  it("resolves game assets relative to a nested deployment path", () => {
+    expect(assetUrl("games/street-fight-dojo.wasm", "https://example.com/build/42/index.html")).toBe(
+      "https://example.com/build/42/games/street-fight-dojo.wasm",
+    );
   });
 });
 

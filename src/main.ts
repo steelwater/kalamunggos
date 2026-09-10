@@ -1,6 +1,6 @@
 import "./styles.css";
 import { combineButtons, games, getGame, type ButtonName, type GameDefinition } from "./game-registry";
-import { WasmGame } from "./runtime/wasm-game";
+import { assetUrl, WasmGame } from "./runtime/wasm-game";
 import { loadSettings, saveSettings } from "./settings";
 import { nextSkin, skins } from "./skins";
 
@@ -348,7 +348,7 @@ menu.addEventListener("click", (event) => {
   if (action === "about") {
     about.hidden = !about.hidden;
     if (!about.hidden) {
-      fetch("/games/build-metadata.json")
+      fetch(assetUrl("games/build-metadata.json"))
         .then((response) => response.json())
         .then((metadata: { builtAt: string; games: Array<{ displayName: string; commit: string }> }) => {
           about.innerHTML = `<button class="about-close" type="button" aria-label="Close about screen">×</button><p>Kalamunggos ${kalamunggosVersion}</p>${metadata.games.map((game) => `<p>${game.displayName}<br><code>${game.commit.slice(0, 12)}</code></p>`).join("")}<p>Built ${new Date(metadata.builtAt).toLocaleString()}</p>`;
