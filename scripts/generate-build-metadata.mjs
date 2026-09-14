@@ -9,15 +9,18 @@ const games = [
   { id: "secret-console", displayName: "Secret Console", path: "games/secret-console" },
 ];
 
-const metadata = {
-  builtAt: new Date().toISOString(),
-  games: games.map((game) => ({
+const pinnedGames = games.map((game) => ({
     id: game.id,
     displayName: game.displayName,
     commit: execFileSync("git", ["-C", resolve(root, game.path), "rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
-  })),
+}));
+
+const metadata = {
+  builtAt: new Date().toISOString(),
+  games: pinnedGames,
 };
 
 const output = resolve(root, "public/games/build-metadata.json");
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, `${JSON.stringify(metadata, null, 2)}\n`);
+writeFileSync(resolve(root, "game-builds.lock.json"), `${JSON.stringify({ games: pinnedGames }, null, 2)}\n`);

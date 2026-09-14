@@ -290,14 +290,14 @@ button { font: inherit; }
 
 .app-shell.is-landscape .handheld { padding-block: max(env(safe-area-inset-top), 8px) max(env(safe-area-inset-bottom), 8px); }
 .app-shell.is-landscape .console-body { grid-template-rows: minmax(0, 1fr) auto; gap: 6px; width: min(100%, 980px); }
-.app-shell.is-landscape .display-stack { width: min(100%, 440px); }
+.app-shell.is-landscape .display-stack { width: min(100%, 92vh, 440px); }
 .app-shell.is-landscape .title-display { margin-bottom: 6px; }
 .app-shell.is-landscape .system-menu { gap: 3px; padding: 6px 10px; }
 .app-shell.is-landscape .menu-heading h2 { font-size: clamp(.85rem, 2vw, 1.1rem); }
 .app-shell.is-landscape .menu-heading em { font-size: clamp(.48rem, 1.2vw, .62rem); }
 .app-shell.is-landscape .menu-actions button { font-size: clamp(.6rem, 1.45vw, .78rem); }
 .app-shell.is-landscape .control-hint { font-size: clamp(.46rem, 1.15vw, .6rem); }
-.app-shell.is-landscape .controls { --dpad-size: min(11vh, 40px); --joystick-size: min(34vh, 140px); grid-template-columns: 1fr 44px 1fr; width: 100%; margin: auto; }
+.app-shell.is-landscape .controls { --dpad-size: min(9vh, 36px); --joystick-size: min(30vh, 124px); grid-template-columns: 1fr 44px 1fr; width: 100%; margin: auto; }
 .app-shell.is-landscape .dpad,
 .app-shell.is-landscape .joystick { justify-self: start; }
 .app-shell.is-landscape .action-buttons { justify-self: end; gap: 12px; }
