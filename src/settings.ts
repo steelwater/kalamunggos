@@ -21,7 +21,9 @@ export function loadSettings(storage: Pick<Storage, "getItem"> = localStorage): 
     const saved = JSON.parse(storage.getItem(key) ?? "null") as Partial<Settings> | null;
     if (!saved) return { ...defaultSettings };
     return {
-      skin: saved.skin === "dark" || saved.skin === "rainbow" ? saved.skin : "white",
+      skin: saved.skin && ["white", "dark", "rainbow", "high-contrast-light", "high-contrast-dark"].includes(saved.skin)
+        ? saved.skin as SkinId
+        : "white",
       sound: saved.sound ?? true,
       vibration: saved.vibration ?? true,
       titleDisplay: saved.titleDisplay ?? true,

@@ -8,6 +8,7 @@ export const BUTTONS = {
 } as const;
 
 export type ButtonName = keyof typeof BUTTONS;
+export type ControllerType = "dpad" | "joystick";
 
 export interface GameDefinition {
   id: string;
@@ -17,6 +18,8 @@ export interface GameDefinition {
   sourcePath: string;
   modulePath: string;
   moduleFactory: string;
+  controller: ControllerType;
+  speedMultiplier?: number;
 }
 
 export const games: readonly GameDefinition[] = [
@@ -28,6 +31,7 @@ export const games: readonly GameDefinition[] = [
     sourcePath: "arduboy/StreetFightDojo/StreetFightDojo.ino",
     modulePath: "games/street-fight-dojo.js",
     moduleFactory: "Kalamunggos_street_fight_dojo",
+    controller: "joystick",
   },
   {
     id: "secret-console",
@@ -37,6 +41,8 @@ export const games: readonly GameDefinition[] = [
     sourcePath: "arduboy/SecretConsole/SecretConsole.ino",
     modulePath: "games/secret-console.js",
     moduleFactory: "Kalamunggos_secret_console",
+    controller: "dpad",
+    speedMultiplier: 0.85,
   },
 ] as const;
 
@@ -50,4 +56,8 @@ export function combineButtons(buttons: Iterable<ButtonName>): number {
   let mask = 0;
   for (const button of buttons) mask |= BUTTONS[button];
   return mask;
+}
+
+export function effectiveFrameRate(definition: GameDefinition, nativeFrameRate: number): number {
+  return Math.max(1, nativeFrameRate * (definition.speedMultiplier ?? 1));
 }
