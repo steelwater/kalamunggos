@@ -76,7 +76,7 @@ root.innerHTML = `
             <button data-button="right" aria-label="Right">▶</button>
             <button data-button="down" aria-label="Down">▼</button>
           </div>
-          <div class="joystick" role="group" aria-label="Eight-way directional joystick" hidden>
+          <div class="joystick" aria-hidden="true" hidden>
             <div class="joystick-knob" aria-hidden="true"></div>
           </div>
           <button class="system-button" aria-label="Open Kalamunggos menu"><span></span></button>
@@ -262,7 +262,8 @@ function releaseButton(button: ButtonName, element?: HTMLElement): void {
 
 function updateControllerUi(): void {
   const usesJoystick = activeDefinition?.controller === "joystick";
-  dpad.hidden = usesJoystick;
+  dpad.hidden = false;
+  dpad.classList.toggle("is-assistive-only", usesJoystick);
   joystick.hidden = !usesJoystick;
 }
 
@@ -436,11 +437,14 @@ function updateLayout(): void {
   cancelAnimationFrame(layoutFrame);
   layoutFrame = requestAnimationFrame(() => {
     const viewport = window.visualViewport;
+    const hasMobileInput = navigator.maxTouchPoints > 0
+      && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     const orientation = resolveLayoutOrientation(
       viewport?.width ?? window.innerWidth,
       viewport?.height ?? window.innerHeight,
       screen.orientation?.type,
       window.self !== window.top,
+      hasMobileInput,
     );
     shell.classList.toggle("is-portrait", orientation === "portrait");
     shell.classList.toggle("is-landscape", orientation === "landscape");

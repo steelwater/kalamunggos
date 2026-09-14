@@ -83,12 +83,16 @@ describe("layout orientation", () => {
     expect(resolveLayoutOrientation(400, 800)).toBe("portrait");
   });
 
-  it("uses device orientation when an embedded viewport keeps stale dimensions", () => {
-    expect(resolveLayoutOrientation(400, 800, "landscape-primary", true)).toBe("landscape");
+  it("uses device orientation when a mobile embedded viewport keeps stale dimensions", () => {
+    expect(resolveLayoutOrientation(400, 800, "landscape-primary", true, true)).toBe("landscape");
   });
 
   it("keeps usable viewport dimensions authoritative outside an embed", () => {
     expect(resolveLayoutOrientation(400, 800, "landscape-primary")).toBe("portrait");
+  });
+
+  it("keeps iframe dimensions authoritative on desktop", () => {
+    expect(resolveLayoutOrientation(400, 800, "landscape-primary", true, false)).toBe("portrait");
   });
 });
 

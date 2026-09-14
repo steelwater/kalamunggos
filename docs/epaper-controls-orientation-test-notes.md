@@ -9,8 +9,11 @@
 - All five skins cycle and both high-contrast choices survive settings reload.
 - High Contrast Light and High Contrast Dark were inspected on the Game Select and paused System Menu surfaces.
 - High Contrast Light was visually rechecked with black bezel padding around the game canvas.
+- Both high-contrast About views follow their black/white screen palette, and the title display has no text shadow.
 - A 390 × 844 browser viewport was changed live to 844 × 390 and back while Street Fight Dojo and its System Menu were open. Content and controls reflowed without a reload or clipping.
+- A portrait-shaped desktop embed remains in portrait layout even when the host screen reports landscape orientation; only embedded mobile/coarse-pointer contexts may use the device-orientation fallback.
 - A diagonal joystick drag returned the knob to center on release.
+- When the visual joystick replaces the D-pad, equivalent Up, Down, Left, and Right buttons remain available in the accessibility tree without changing the visible layout.
 
 ## Physical-device feedback
 
