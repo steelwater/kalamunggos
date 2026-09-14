@@ -1,5 +1,7 @@
 import "./styles.css";
-import { combineButtons, games, getGame, type ButtonName, type GameDefinition } from "./game-registry";
+import { combineButtons, effectiveFrameRate, games, getGame, type ButtonName, type GameDefinition } from "./game-registry";
+import { clampJoystick, joystickDirections } from "./joystick";
+import { resolveLayoutOrientation } from "./layout";
 import { assetUrl, WasmGame } from "./runtime/wasm-game";
 import { loadSettings, saveSettings } from "./settings";
 import { nextSkin, skins } from "./skins";
@@ -15,6 +17,7 @@ let activeDefinition: GameDefinition | undefined;
 let animationFrame = 0;
 let lastGameFrame = 0;
 const heldButtons = new Set<ButtonName>();
+const joystickButtons = new Set<ButtonName>();
 const releaseTimers = new Map<ButtonName, number>();
 const menuPageSize = 4;
 let selectedGameIndex = 0;
@@ -73,6 +76,9 @@ root.innerHTML = `
             <button data-button="right" aria-label="Right">▶</button>
             <button data-button="down" aria-label="Down">▼</button>
           </div>
+          <div class="joystick" aria-hidden="true" hidden>
+            <div class="joystick-knob" aria-hidden="true"></div>
+          </div>
           <button class="system-button" aria-label="Open Kalamunggos menu"><span></span></button>
           <div class="action-buttons" role="group" aria-label="Action buttons">
             <button data-button="b" aria-label="B button"><span>B</span></button>
@@ -96,13 +102,16 @@ const gameButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-game]")]
 const menuButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-action]")];
 const menuPage = root.querySelector<HTMLElement>(".menu-page")!;
 const pageButtons = [...root.querySelectorAll<HTMLButtonElement>("[data-page]")];
+const dpad = root.querySelector<HTMLElement>(".dpad")!;
+const joystick = root.querySelector<HTMLElement>(".joystick")!;
+const joystickKnob = root.querySelector<HTMLElement>(".joystick-knob")!;
 
 context.imageSmoothingEnabled = false;
 
 function updateSettingsUi(): void {
   shell.classList.remove(...skins.map((skin) => skin.className));
   shell.classList.add(`skin-${settings.skin}`);
-  root.querySelector<HTMLElement>(".skin-name")!.textContent = settings.skin;
+  root.querySelector<HTMLElement>(".skin-name")!.textContent = skins.find((skin) => skin.id === settings.skin)!.name;
   root.querySelector<HTMLElement>(".sound-state")!.textContent = settings.sound ? "On" : "Off";
   root.querySelector<HTMLElement>(".vibration-state")!.textContent = settings.vibration ? "On" : "Off";
   root.querySelector<HTMLElement>(".title-state")!.textContent = settings.titleDisplay ? "On" : "Off";
@@ -151,6 +160,7 @@ function updateMenuSelection(): void {
 function showMenu(): void {
   if (!activeGame) return;
   heldButtons.clear();
+  resetJoystick();
   selectedMenuIndex = 0;
   about.hidden = true;
   menu.hidden = false;
@@ -158,7 +168,7 @@ function showMenu(): void {
 }
 
 function buttonMask(): number {
-  return combineButtons(heldButtons);
+  return combineButtons([...heldButtons, ...joystickButtons]);
 }
 
 function render(framebuffer: Uint8Array): void {
@@ -175,7 +185,9 @@ function render(framebuffer: Uint8Array): void {
 }
 
 function tick(now: number): void {
-  const frameDuration = activeGame ? 1000 / activeGame.frameRate : 0;
+  const frameDuration = activeGame && activeDefinition
+    ? 1000 / effectiveFrameRate(activeDefinition, activeGame.frameRate)
+    : 0;
   if (activeGame && menu.hidden && now - lastGameFrame >= frameDuration - 0.5) {
     const elapsedFrames = Math.max(1, Math.floor((now - lastGameFrame + 0.5) / frameDuration));
     lastGameFrame += elapsedFrames * frameDuration;
@@ -187,7 +199,9 @@ function tick(now: number): void {
 async function launch(definition: GameDefinition): Promise<void> {
   cancelAnimationFrame(animationFrame);
   heldButtons.clear();
+  resetJoystick();
   activeDefinition = definition;
+  updateControllerUi();
   titleDisplay.hidden = !settings.titleDisplay;
   updateTitle(definition);
   library.hidden = true;
@@ -198,7 +212,7 @@ async function launch(definition: GameDefinition): Promise<void> {
   context.fillRect(0, 0, 128, 64);
   try {
     activeGame = await WasmGame.create(definition);
-    lastGameFrame = 0;
+    lastGameFrame = performance.now();
     animationFrame = requestAnimationFrame(tick);
   } catch (error) {
     showLibrary();
@@ -211,6 +225,8 @@ function showLibrary(): void {
   activeGame = undefined;
   activeDefinition = undefined;
   heldButtons.clear();
+  resetJoystick();
+  updateControllerUi();
   menu.hidden = true;
   about.hidden = true;
   canvas.hidden = true;
@@ -242,6 +258,59 @@ function releaseButton(button: ButtonName, element?: HTMLElement): void {
     setButton(button, false, element);
     releaseTimers.delete(button);
   }, 50));
+}
+
+function updateControllerUi(): void {
+  const usesJoystick = activeDefinition?.controller === "joystick";
+  dpad.hidden = false;
+  dpad.classList.toggle("is-assistive-only", usesJoystick);
+  joystick.hidden = !usesJoystick;
+}
+
+let activeJoystickPointer: number | undefined;
+let lastJoystickUiDirection = "";
+
+function resetJoystick(): void {
+  joystickButtons.clear();
+  joystickKnob.style.transform = "translate(0, 0)";
+  activeJoystickPointer = undefined;
+  lastJoystickUiDirection = "";
+}
+
+function updateJoystick(event: PointerEvent): void {
+  const bounds = joystick.getBoundingClientRect();
+  const radius = Math.max(1, (bounds.width - joystickKnob.offsetWidth) / 2);
+  const position = clampJoystick(event.clientX - bounds.left - bounds.width / 2, event.clientY - bounds.top - bounds.height / 2, radius);
+  const directions = joystickDirections(position.x, position.y, radius, [...joystickButtons]);
+  joystickKnob.style.transform = `translate(${position.x}px, ${position.y}px)`;
+
+  if (!library.hidden || !menu.hidden) {
+    joystickButtons.clear();
+    const nextDirection = directions[0] ?? "";
+    if (nextDirection && nextDirection !== lastJoystickUiDirection) handleKalaInput(nextDirection);
+    lastJoystickUiDirection = nextDirection;
+    return;
+  }
+
+  const wasNeutral = joystickButtons.size === 0;
+  joystickButtons.clear();
+  for (const direction of directions) joystickButtons.add(direction);
+  if (wasNeutral && directions.length && settings.vibration && "vibrate" in navigator) navigator.vibrate(12);
+}
+
+joystick.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  activeJoystickPointer = event.pointerId;
+  joystick.setPointerCapture(event.pointerId);
+  updateJoystick(event);
+});
+joystick.addEventListener("pointermove", (event) => {
+  if (event.pointerId === activeJoystickPointer) updateJoystick(event);
+});
+for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"] as const) {
+  joystick.addEventListener(eventName, (event) => {
+    if (event.pointerId === activeJoystickPointer) resetJoystick();
+  });
 }
 
 gameButtons.forEach((button, index) => {
@@ -323,6 +392,7 @@ window.addEventListener("blur", () => {
   for (const timer of releaseTimers.values()) window.clearTimeout(timer);
   releaseTimers.clear();
   heldButtons.clear();
+  resetJoystick();
 });
 
 pageButtons.forEach((button) => {
@@ -362,4 +432,30 @@ about.addEventListener("click", (event) => {
   if ((event.target as HTMLElement).closest(".about-close")) about.hidden = true;
 });
 
+let layoutFrame = 0;
+function updateLayout(): void {
+  cancelAnimationFrame(layoutFrame);
+  layoutFrame = requestAnimationFrame(() => {
+    const viewport = window.visualViewport;
+    const hasMobileInput = navigator.maxTouchPoints > 0
+      && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    const orientation = resolveLayoutOrientation(
+      viewport?.width ?? window.innerWidth,
+      viewport?.height ?? window.innerHeight,
+      screen.orientation?.type,
+      window.self !== window.top,
+      hasMobileInput,
+    );
+    shell.classList.toggle("is-portrait", orientation === "portrait");
+    shell.classList.toggle("is-landscape", orientation === "landscape");
+  });
+}
+
+window.addEventListener("resize", updateLayout);
+window.addEventListener("orientationchange", updateLayout);
+window.visualViewport?.addEventListener("resize", updateLayout);
+screen.orientation?.addEventListener("change", updateLayout);
+
 updateSettingsUi();
+updateControllerUi();
+updateLayout();

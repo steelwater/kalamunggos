@@ -47,4 +47,6 @@ Open the resulting native projects with `npx cap open ios` or `npx cap open andr
 
 Keyboard controls for desktop development are the arrow keys, `Z` for A, `X` for B, and Escape for the Kalamunggos menu.
 
+The Change Skin menu includes White, Dark, Rainbow, High Contrast Light, and High Contrast Dark. Street Fight Dojo uses an eight-way digital touch joystick while Secret Console retains the D-pad. Layout changes follow the usable viewport and react immediately to resize and orientation signals, including an embedded-player fallback for itch.io.
+
 See [docs/architecture.md](docs/architecture.md) for boundaries and runtime details.
