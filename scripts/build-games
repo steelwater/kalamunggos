@@ -12,6 +12,8 @@ if ! command -v emcc >/dev/null 2>&1; then
   exit 1
 fi
 
+node "$repo_root/scripts/generate-build-metadata.mjs"
+
 build_game() {
   local id="$1"
   local source="$2"
@@ -34,4 +36,3 @@ build_game() {
 
 build_game "street-fight-dojo" "$repo_root/games/street-fight-dojo/arduboy/StreetFightDojo/StreetFightDojo.ino"
 build_game "secret-console" "$repo_root/games/secret-console/arduboy/SecretConsole/SecretConsole.ino"
-node "$repo_root/scripts/generate-build-metadata.mjs"

@@ -13,4 +13,4 @@ Controller choice is also registry-owned. The D-pad and eight-way joystick both 
 
 EEPROM is a 1 KiB buffer persisted to a separate local-storage key for each stable game ID. Tone sequences cross the WebAssembly boundary as frequency/duration pairs and are played through Web Audio when sound is enabled.
 
-Development synchronization follows each upstream repository's `main` branch. A build records the exact checked-out commit in `public/games/build-metadata.json`; release artifacts contain those compiled modules and never download executable game code at runtime.
+Development synchronization follows each upstream repository's `main` branch. Only `npm run sync:games` updates the tracked revisions in `game-builds.lock.json`. Normal builds validate both submodule checkouts against that lock before compiling and generate `public/games/build-metadata.json` from the validated locked revisions. Release artifacts contain those compiled modules and never download executable game code at runtime.

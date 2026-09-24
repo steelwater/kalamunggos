@@ -1,0 +1,14 @@
+{
+  "games": [
+    {
+      "id": "street-fight-dojo",
+      "displayName": "Street Fight Dojo",
+      "commit": "523eebada0cd5ac50e4d9f43bcd328a08e5a2fff"
+    },
+    {
+      "id": "secret-console",
+      "displayName": "Secret Console",
+      "commit": "961dadcf245edaaa6fccb5d50582bca74d73f7f5"
+    }
+  ]
+}
