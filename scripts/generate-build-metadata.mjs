@@ -10,11 +10,17 @@ export const games = [
 ];
 
 export function readCurrentGames(repoRoot) {
-  return games.map((game) => ({
-    id: game.id,
-    displayName: game.displayName,
-    commit: execFileSync("git", ["-C", resolve(repoRoot, game.path), "rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
-  }));
+  return games.map((game) => {
+    const gameRoot = resolve(repoRoot, game.path);
+    return {
+      id: game.id,
+      displayName: game.displayName,
+      commit: execFileSync("git", ["-C", gameRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+      dirty: execFileSync("git", ["-C", gameRoot, "status", "--porcelain=v1", "--untracked-files=all"], {
+        encoding: "utf8",
+      }).length > 0,
+    };
+  });
 }
 
 export function readLockedGames(repoRoot) {
@@ -46,6 +52,11 @@ export function validateLockedGames(lockedGames, currentGames) {
         "Run npm run sync:games to update game revisions intentionally.",
       );
     }
+    if (current.dirty) {
+      throw new Error(
+        `Dirty game worktree for ${locked.displayName}. Commit, stash, or discard its staged, unstaged, and untracked changes before building.`,
+      );
+    }
   }
 }
 
@@ -62,11 +73,11 @@ export function validateGameRevisions(repoRoot, currentGames) {
   return lockedGames;
 }
 
-export function updateLockAndMetadata(repoRoot, currentGames, builtAt = new Date().toISOString()) {
+export function updateLock(repoRoot, currentGames) {
   assertKnownGames(currentGames, "Current submodules");
-  writeFileSync(resolve(repoRoot, "game-builds.lock.json"), `${JSON.stringify({ games: currentGames }, null, 2)}\n`);
-  writeRuntimeMetadata(repoRoot, currentGames, builtAt);
-  return currentGames;
+  const pinnedGames = currentGames.map(({ id, displayName, commit }) => ({ id, displayName, commit }));
+  writeFileSync(resolve(repoRoot, "game-builds.lock.json"), `${JSON.stringify({ games: pinnedGames }, null, 2)}\n`);
+  return pinnedGames;
 }
 
 function main() {
@@ -81,7 +92,7 @@ function main() {
   }
 
   const currentGames = readCurrentGames(root);
-  if (mode === "--update-lock") updateLockAndMetadata(root, currentGames);
+  if (mode === "--update-lock") updateLock(root, currentGames);
   else validateGameRevisions(root, currentGames);
 }
 

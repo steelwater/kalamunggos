@@ -1,9 +1,9 @@
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { updateLockAndMetadata, validateGameRevisions, writeRuntimeMetadata } from "./generate-build-metadata.mjs";
+import { games, readCurrentGames, updateLock, validateGameRevisions, writeRuntimeMetadata } from "./generate-build-metadata.mjs";
 
 const revisions = {
   street: "523eebada0cd5ac50e4d9f43bcd328a08e5a2fff",
@@ -19,6 +19,23 @@ let repoRoot;
 
 function lockContents() {
   return readFileSync(join(repoRoot, "game-builds.lock.json"), "utf8");
+}
+
+function initializeGameRepositories() {
+  for (const game of games) {
+    const gameRoot = join(repoRoot, game.path);
+    mkdirSync(gameRoot, { recursive: true });
+    execFileSync("git", ["init", "-q"], { cwd: gameRoot });
+    writeFileSync(join(gameRoot, "source.txt"), "clean source\n");
+    execFileSync("git", ["add", "source.txt"], { cwd: gameRoot });
+    execFileSync("git", ["-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-q", "-m", "fixture"], {
+      cwd: gameRoot,
+    });
+  }
+
+  const currentGames = readCurrentGames(repoRoot);
+  const pinnedGames = currentGames.map(({ dirty: _dirty, ...game }) => game);
+  writeFileSync(join(repoRoot, "game-builds.lock.json"), `${JSON.stringify({ games: pinnedGames }, null, 2)}\n`);
 }
 
 beforeEach(() => {
@@ -60,15 +77,32 @@ describe("game build metadata", () => {
     expect(lockContents()).toBe(before);
   });
 
-  it("allows explicit synchronization to update the lock and runtime metadata", () => {
+  it.each([
+    { id: "secret-console", displayName: "Secret Console", change: "untracked" },
+    { id: "street-fight-dojo", displayName: "Street Fight Dojo", change: "unstaged" },
+    { id: "street-fight-dojo", displayName: "Street Fight Dojo", change: "staged" },
+  ])("rejects a $change change in the $displayName worktree", ({ id, displayName, change }) => {
+    initializeGameRepositories();
+    const game = games.find((candidate) => candidate.id === id);
+    const gameRoot = join(repoRoot, game.path);
+    if (change === "untracked") {
+      writeFileSync(join(gameRoot, "untracked.txt"), "untracked source\n");
+    } else {
+      writeFileSync(join(gameRoot, "source.txt"), `${change} source\n`);
+      if (change === "staged") execFileSync("git", ["add", "source.txt"], { cwd: gameRoot });
+    }
+
+    expect(() => validateGameRevisions(repoRoot, readCurrentGames(repoRoot))).toThrow(`Dirty game worktree for ${displayName}`);
+  });
+
+  it("allows explicit synchronization to update only the lock", () => {
     const synchronizedGames = lockedGames.map((game) => ({ ...game, commit: `${game.commit}-updated` }));
-    updateLockAndMetadata(repoRoot, synchronizedGames, "2026-09-24T01:00:00.000Z");
+    const metadataPath = join(repoRoot, "public/games/build-metadata.json");
+    writeFileSync(metadataPath, "existing successful build metadata\n");
+    updateLock(repoRoot, synchronizedGames);
 
     expect(JSON.parse(lockContents())).toEqual({ games: synchronizedGames });
-    expect(JSON.parse(readFileSync(join(repoRoot, "public/games/build-metadata.json"), "utf8"))).toEqual({
-      builtAt: "2026-09-24T01:00:00.000Z",
-      games: synchronizedGames,
-    });
+    expect(readFileSync(metadataPath, "utf8")).toBe("existing successful build metadata\n");
   });
 
   it("does not refresh runtime metadata when the second game compilation fails", () => {
