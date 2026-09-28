@@ -49,16 +49,16 @@ export function validateLockedGames(lockedGames, currentGames) {
   }
 }
 
-function writeRuntimeMetadata(repoRoot, pinnedGames, builtAt) {
+export function writeRuntimeMetadata(repoRoot, pinnedGames, builtAt = new Date().toISOString()) {
+  assertKnownGames(pinnedGames, "Validated game revisions");
   const output = resolve(repoRoot, "public/games/build-metadata.json");
   mkdirSync(dirname(output), { recursive: true });
   writeFileSync(output, `${JSON.stringify({ builtAt, games: pinnedGames }, null, 2)}\n`);
 }
 
-export function validateAndGenerateMetadata(repoRoot, currentGames, builtAt = new Date().toISOString()) {
+export function validateGameRevisions(repoRoot, currentGames) {
   const lockedGames = readLockedGames(repoRoot);
   validateLockedGames(lockedGames, currentGames);
-  writeRuntimeMetadata(repoRoot, lockedGames, builtAt);
   return lockedGames;
 }
 
@@ -70,13 +70,19 @@ export function updateLockAndMetadata(repoRoot, currentGames, builtAt = new Date
 }
 
 function main() {
-  const updateLock = process.argv.slice(2).includes("--update-lock");
-  const unknownArguments = process.argv.slice(2).filter((argument) => argument !== "--update-lock");
+  const [mode, ...unknownArguments] = process.argv.slice(2);
+  const supportedModes = ["--validate-only", "--write-metadata", "--update-lock"];
+  if (!supportedModes.includes(mode)) throw new Error(`Expected one of: ${supportedModes.join(", ")}`);
   if (unknownArguments.length) throw new Error(`Unknown argument: ${unknownArguments[0]}`);
 
+  if (mode === "--write-metadata") {
+    writeRuntimeMetadata(root, readLockedGames(root));
+    return;
+  }
+
   const currentGames = readCurrentGames(root);
-  if (updateLock) updateLockAndMetadata(root, currentGames);
-  else validateAndGenerateMetadata(root, currentGames);
+  if (mode === "--update-lock") updateLockAndMetadata(root, currentGames);
+  else validateGameRevisions(root, currentGames);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) main();
