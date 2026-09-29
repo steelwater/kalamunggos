@@ -40,7 +40,7 @@ int main() {
 #endif
 
 #ifdef EXPECT_SECRET_CONSOLE
-  press(1);   // Leave the startup screen.
+  press(16);  // Select Play from the main menu.
   press(1);   // Up.
   press(1);   // Up.
   press(16);  // A completes the Moon Cat code.
